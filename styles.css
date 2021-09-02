@@ -8,7 +8,7 @@ body, html {
     overflow: hidden;
 }
 
-.paper {
+#paper {
     position: fixed;
     left: 27%;
     width: 40%;
@@ -17,7 +17,7 @@ body, html {
     background-color: aliceblue;
 }
 
-.burn {
+#burn {
     position: fixed;
     left: 0%;
     right: 0%;
