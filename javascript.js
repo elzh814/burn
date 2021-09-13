@@ -1,21 +1,49 @@
 var fireCanvas = document.getElementById("burn"); // main canvas for fire effect
-fireCanvas.width = window.innerWidth;
-fireCanvas.height = window.innerHeight;
+// fireCanvas.width = window.innerWidth;
+// fireCanvas.height = window.innerHeight;
+
+//fireCanvas starts at size 0, 0 until start button is pressed
+fireCanvas.width = 0;
+fireCanvas.height = 0;
+
 var fireCtx = fireCanvas.getContext("2d");
-const particleArray = []
+const particleArray = [];
 
 var paperCanvas = document.getElementById("paper");
 var paperCtx = paperCanvas.getContext("2d");
+const circlesArray = [];
 
 const mouse = {
     x: undefined,
     y: undefined,
 }
 
+const canvasMouse = {
+    x: undefined,
+    y: undefined,
+}
 
+function getCanvasMouse(x, y) {
+    let canvasRect = paperCanvas.getBoundingClientRect();
+    let scaleX = paperCanvas.width/canvasRect.width;
+    let scaleY = paperCanvas.height/canvasRect.height;
 
-//resizes fireCanvas when window is resized
-window.addEventListener('resize', function() {
+    canvasMouse.x = (x - canvasRect.left) * scaleX;
+    canvasMouse.y = (y - canvasRect.top) * scaleY;
+}
+
+//makes fireCanvas size equal window so fire effect can appear
+document.getElementById("startButton").addEventListener('click', function(event){
+    fireCanvas.width = window.innerWidth;
+    fireCanvas.height = window.innerHeight;
+
+    //TESTING PURPOSE
+    //paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
+    //console.log(paperCanvas.getBoundingClientRect());
+});
+
+//resizes fireCanvas to fit window when window is resized
+window.addEventListener('resize', function(event) {
     fireCanvas.width = window.innerWidth;
     fireCanvas.height = window.innerHeight;
 });
@@ -24,7 +52,15 @@ window.addEventListener('resize', function() {
 fireCanvas.addEventListener('mousemove', function(event){
     mouse.x = event.x;
     mouse.y = event.y;
-    particleArray.push(new Particle());
+    getCanvasMouse(event.x, event.y);
+
+    for (let i = 0; i < 15; i ++) {
+        particleArray.push(new Particle());
+    }
+
+    circlesArray.push(new Circle());
+    console.log(circlesArray.length);
+    //handleCircles();
 });
 
 //add particles when mouse is clicked
@@ -78,9 +114,54 @@ function handleParticles() {
         }
     }
 
-    console.log(particleArray.length);
-    window.requestAnimationFrame(handleParticles);
+    // window.requestAnimationFrame(handleParticles);
 }
 
-handleParticles();
+// handleParticles();
 
+class Circle {
+    constructor() {
+    this.size = 0.5;
+    this.burnSpeed = 0.1;
+    this.x = canvasMouse.x;
+    this.y = canvasMouse.y;
+    }
+
+    draw() {
+        paperCtx.beginPath();
+        paperCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        paperCtx.stroke();
+    }
+
+    update() {
+        this.size += this.burnSpeed;
+        // FIND WAY TO MAKE SPEED INVERSE TO SIZE
+    }
+}
+
+function handleCircles() {
+    paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
+    // let canvasRect = paperCanvas.getBoundingClientRect();
+    // let scaleX = paperCanvas.width/canvasRect.width;
+    // let scaleY = paperCanvas.height/canvasRect.height;
+
+    // var x = (mouse.x - canvasRect.left) * scaleX;
+    // var y = (mouse.y - canvasRect.top) * scaleY;
+
+    for (let i = 0; i < circlesArray.length; i++) {
+        circlesArray[i].update();
+        circlesArray[i].draw();
+        if (circlesArray[i].size > 20) {
+            circlesArray.splice(i, 1);
+        }
+    }
+    // window.requestAnimationFrame(handleCircles);
+}
+
+function animate() {
+    handleParticles()
+    handleCircles()
+    window.requestAnimationFrame(animate);
+}
+
+animate();
