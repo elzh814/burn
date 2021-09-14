@@ -1,6 +1,4 @@
 var fireCanvas = document.getElementById("burn"); // main canvas for fire effect
-// fireCanvas.width = window.innerWidth;
-// fireCanvas.height = window.innerHeight;
 
 //fireCanvas starts at size 0, 0 until start button is pressed
 fireCanvas.width = 0;
@@ -38,8 +36,9 @@ document.getElementById("startButton").addEventListener('click', function(event)
     fireCanvas.height = window.innerHeight;
 
     //TESTING PURPOSE
-    //paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
-    //console.log(paperCanvas.getBoundingClientRect());
+    // paperCtx.beginPath();
+    paperCtx.fillStyle = "white";
+    paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
 });
 
 //resizes fireCanvas to fit window when window is resized
@@ -59,8 +58,6 @@ fireCanvas.addEventListener('mousemove', function(event){
     }
 
     circlesArray.push(new Circle());
-    console.log(circlesArray.length);
-    //handleCircles();
 });
 
 //add particles when mouse is clicked
@@ -113,24 +110,23 @@ function handleParticles() {
             i--;
         }
     }
-
-    // window.requestAnimationFrame(handleParticles);
 }
 
-// handleParticles();
 
 class Circle {
     constructor() {
     this.size = 0.5;
-    this.burnSpeed = 0.1;
+    this.burnSpeed = Math.random() * 0.15 + 0.03;
     this.x = canvasMouse.x;
     this.y = canvasMouse.y;
     }
 
     draw() {
+
+        paperCtx.globalCompositeOperation = 'destination-out';
         paperCtx.beginPath();
         paperCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        paperCtx.stroke();
+        paperCtx.fill();
     }
 
     update() {
@@ -140,22 +136,16 @@ class Circle {
 }
 
 function handleCircles() {
-    paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
-    // let canvasRect = paperCanvas.getBoundingClientRect();
-    // let scaleX = paperCanvas.width/canvasRect.width;
-    // let scaleY = paperCanvas.height/canvasRect.height;
-
-    // var x = (mouse.x - canvasRect.left) * scaleX;
-    // var y = (mouse.y - canvasRect.top) * scaleY;
+    //TESTING PURPOSE
+    //paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
 
     for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].update();
         circlesArray[i].draw();
-        if (circlesArray[i].size > 20) {
+        if (circlesArray[i].size > Math.floor(Math.random() * 20 + 15)) {
             circlesArray.splice(i, 1);
         }
     }
-    // window.requestAnimationFrame(handleCircles);
 }
 
 function animate() {
