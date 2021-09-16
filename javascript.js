@@ -21,6 +21,7 @@ const canvasMouse = {
     y: undefined,
 }
 
+//calculates for mouse coordinates relative to canvas
 function getCanvasMouse(x, y) {
     let canvasRect = paperCanvas.getBoundingClientRect();
     let scaleX = paperCanvas.width/canvasRect.width;
@@ -113,6 +114,7 @@ function handleParticles() {
 }
 
 
+//Circle class used to create burning effect
 class Circle {
     constructor() {
     this.size = 0.5;
@@ -121,20 +123,23 @@ class Circle {
     this.y = canvasMouse.y;
     }
 
+    //"erases" the circle from the paper canvas
     draw() {
-
         paperCtx.globalCompositeOperation = 'destination-out';
         paperCtx.beginPath();
         paperCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         paperCtx.fill();
     }
 
+    //increases the size of the circle
     update() {
         this.size += this.burnSpeed;
         // FIND WAY TO MAKE SPEED INVERSE TO SIZE
     }
 }
 
+//handles circle by updating and drawing all circles in the circlesArray. 
+//Slices circles that are a random size between 15 and 20 so they do not conintue updating/ growing.
 function handleCircles() {
     //TESTING PURPOSE
     //paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
@@ -148,6 +153,7 @@ function handleCircles() {
     }
 }
 
+//animates all effects by calling handleParticles and handleCircles.
 function animate() {
     handleParticles()
     handleCircles()
