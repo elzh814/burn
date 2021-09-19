@@ -36,8 +36,10 @@ document.getElementById("startButton").addEventListener('click', function(event)
     fireCanvas.width = window.innerWidth;
     fireCanvas.height = window.innerHeight;
 
-    //TESTING PURPOSE
-    // paperCtx.beginPath();
+    //Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
+    paperCanvas.width = window.innerWidth * 0.4;
+    paperCanvas.height = window.innerHeight * 0.9;
+    
     paperCtx.fillStyle = "white";
     paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
 });
@@ -117,8 +119,8 @@ function handleParticles() {
 //Circle class used to create burning effect
 class Circle {
     constructor() {
-    this.size = 0.5;
-    this.burnSpeed = Math.random() * 0.15 + 0.03;
+    this.size = 0.7;
+    this.burnSpeed = Math.random() * 0.25 + 0.10;
     this.x = canvasMouse.x;
     this.y = canvasMouse.y;
     }
@@ -147,7 +149,7 @@ function handleCircles() {
     for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].update();
         circlesArray[i].draw();
-        if (circlesArray[i].size > Math.floor(Math.random() * 20 + 15)) {
+        if (circlesArray[i].size > Math.floor(Math.random() * 150 + 50)) {
             circlesArray.splice(i, 1);
         }
     }
