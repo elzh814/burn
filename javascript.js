@@ -35,19 +35,18 @@ function getCanvasMouse(x, y) {
 document.getElementById("startButton").addEventListener('click', function(event){
     fireCanvas.width = window.innerWidth;
     fireCanvas.height = window.innerHeight;
+});
 
-    //Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
-    paperCanvas.width = window.innerWidth * 0.4;
-    paperCanvas.height = window.innerHeight * 0.9;
-    
-    paperCtx.fillStyle = "white";
-    paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
+document.getElementById("resetButton").addEventListener('click', function(event) {
+    reset();
 });
 
 //resizes fireCanvas to fit window when window is resized
 window.addEventListener('resize', function(event) {
-    fireCanvas.width = window.innerWidth;
-    fireCanvas.height = window.innerHeight;
+    if (fireCanvas.width != 0) {
+        fireCanvas.width = window.innerWidth;
+        fireCanvas.height = window.innerHeight;
+    }
 });
 
 //adds particles when mouse is moved
@@ -60,7 +59,7 @@ fireCanvas.addEventListener('mousemove', function(event){
         particleArray.push(new Particle());
     }
 
-    circlesArray.push(new Circle());
+        circlesArray.push(new Circle());
 });
 
 //add particles when mouse is clicked
@@ -121,8 +120,8 @@ class Circle {
     constructor() {
     this.size = 0.7;
     this.burnSpeed = Math.random() * 0.25 + 0.10;
-    this.x = canvasMouse.x;
-    this.y = canvasMouse.y;
+    this.x = canvasMouse.x + (Math.random() * 25 - 25);
+    this.y = canvasMouse.y + (Math.random() * 25 - 25);
     }
 
     //"erases" the circle from the paper canvas
@@ -149,10 +148,24 @@ function handleCircles() {
     for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].update();
         circlesArray[i].draw();
-        if (circlesArray[i].size > Math.floor(Math.random() * 150 + 50)) {
+        if (circlesArray[i].size > Math.floor(Math.random() * 500 + 20)) { //150 - 50
             circlesArray.splice(i, 1);
         }
     }
+}
+
+function reset() {
+    circlesArray.splice(0, (circlesArray.length - 1));
+    particleArray.splice(0, (particleArray.length - 1));
+    fireCanvas.width = 0;
+    fireCanvas.height = 0;
+
+    paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
+    paperCanvas.width = window.innerWidth * 0.4;
+    paperCanvas.height = window.innerHeight * 0.9;
+    paperCtx.fillStyle = "white";
+    paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
+    paperCanvas.globalCompositeOperation = 'source-over';
 }
 
 //animates all effects by calling handleParticles and handleCircles.
@@ -162,4 +175,10 @@ function animate() {
     window.requestAnimationFrame(animate);
 }
 
+
+//Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
+paperCanvas.width = window.innerWidth * 0.4;
+paperCanvas.height = window.innerHeight * 0.9;
+paperCtx.fillStyle = "white";
+paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
 animate();
