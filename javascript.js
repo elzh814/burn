@@ -1,3 +1,6 @@
+//* ********************* *//
+//  VARIABLE DECLARATIONS //
+//* ******************** *//
 var fireCanvas = document.getElementById("burn"); // main canvas for fire effect
 
 //fireCanvas starts at size 0, 0 until start button is pressed
@@ -11,11 +14,23 @@ var paperCanvas = document.getElementById("paper");
 var paperCtx = paperCanvas.getContext("2d");
 const circlesArray = [];
 
+var backCanvas = document.getElementById("back");
+var backCtx = backCanvas.getContext("2d");
+backCanvas.width = window.innerWidth;
+backCanvas.height = window.innerHeight;
+const backArray = [];
+
+//determines if user wants to draw on paper. If false, user cannot draw on paper. If true, user can draw on paper.
+var isPainting = false;
+
 const mouse = {
     x: undefined,
     y: undefined,
+    //TESTING PURPOSE
+    down: undefined,
 }
 
+//coordinates of mouse relative to paperCanvas.
 const canvasMouse = {
     x: undefined,
     y: undefined,
@@ -31,14 +46,37 @@ function getCanvasMouse(x, y) {
     canvasMouse.y = (y - canvasRect.top) * scaleY;
 }
 
+
+//* ************* *//
+// EVENT LISTENERS //
+//* ************* *//
+
 //makes fireCanvas size equal window so fire effect can appear
 document.getElementById("startButton").addEventListener('click', function(event){
     fireCanvas.width = window.innerWidth;
     fireCanvas.height = window.innerHeight;
+
+    //ISSUE: PRESSING START "SPEEDS UP" ALL ANIMATIONS. MAKE ISSTARTED VARIABLE AND TEST IF FALSE BEFORE CALLING ANIMATE FUNCTION 
+    //CAN ALSO JUST MAKE START BUTTON TURN INTO END BUTTON INSTEAD OF STAYING START BUTTON
+    animate();
 });
 
+//calls reset function to clear circle and particle arrays and reset paper
 document.getElementById("resetButton").addEventListener('click', function(event) {
     reset();
+});
+
+//sets draw to true if draw is false. Sets draw to false if draw is true.
+document.getElementById("drawButton").addEventListener('click', function(event) {
+    if(!isPainting) {
+        document.getElementById("drawButton").innerHTML = "stop drawing";
+        isPainting = true;
+        mouse.down = false;
+    } else {
+        isPainting = false;
+        mouse.down = false;
+        document.getElementById("drawButton").innerHTML = "draw";
+    }
 });
 
 //resizes fireCanvas to fit window when window is resized
@@ -56,9 +94,8 @@ fireCanvas.addEventListener('mousemove', function(event){
     getCanvasMouse(event.x, event.y);
 
     for (let i = 0; i < 15; i ++) {
-        particleArray.push(new Particle());
+        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17));
     }
-
         circlesArray.push(new Circle());
 });
 
@@ -67,16 +104,53 @@ fireCanvas.addEventListener('click', function(event){
     mouse.x = event.x;
     mouse.y = event.y;
     for (let i = 0; i < 15; i ++) {
-        particleArray.push(new Particle());
+        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17));
     }
 });
 
+
+//* ******** *//
+//  PAINTING  //
+//* ******** *//
+paperCanvas.addEventListener('mouseup', isDown);
+paperCanvas.addEventListener('mousedown', isDown);
+paperCanvas.addEventListener('mousemove', paint);
+paperCanvas.addEventListener('mouseleave', isDown);
+
+//paints onto the fireCanvas
+function paint(event) {
+    if (isPainting && mouse.down) {
+        getCanvasMouse(event.x, event.y)
+        paperCtx.lineWidth = 10;
+        paperCtx.lineCap = 'round';
+        paperCtx.lineTo(canvasMouse.x, canvasMouse.y);
+        paperCtx.stroke();
+    }
+};
+
+//Checks if the mouse is down
+function isDown(event) {
+    if(event.type == 'mousedown') {
+        getCanvasMouse(event.x, event.y);
+        paperCtx.beginPath();
+        paperCtx.moveTo(canvasMouse.x, canvasMouse.y);
+        mouse.down = true;
+    } else if (event.type == 'mouseup' || event.type == 'mouseleave') {
+        paperCtx.closePath();
+        mouse.down = false;
+    }
+}
+
+//* ************** *//
+// PARTICLE EFFECT //
+//* ************* *//
+
 //Particle class. Circles that are used to create flame effect
 class Particle {
-    constructor() {
-        this.x = mouse.x;
-        this.y = mouse.y;
-        this.size = Math.random() * 15 + 2;
+    constructor(x, y, minSize, maxSize) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * (maxSize - minSize) + minSize;
         this.speedX = Math.random() * 3 - 1.5;
         this.speedY = Math.random() * -3 - 1.5;
         this.hue = 65;
@@ -93,27 +167,48 @@ class Particle {
     }
 
     //draws the particles on the fireCanvas
-    draw() {
-        fireCtx.fillStyle = this.color;
-        fireCtx.beginPath();
-        fireCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        fireCtx.fill();
+    draw(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
     }
 }
 
 //Handles the drawing and movement of the particles using requestAnimationFrame function
 function handleParticles() {
     fireCtx.clearRect(0, 0, fireCanvas.width, fireCanvas.height);
+
     for (let i = 0; i < particleArray.length; i++) {
-        particleArray[i].draw();
+        particleArray[i].draw(fireCtx);
         particleArray[i].move();
         if (particleArray[i].size < 0) {
             particleArray.splice(i, 1);
             i--;
         }
     }
+
+    //TESTING PURPOSES
+    backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
+   
+    backArray.push(new Particle(backCanvas.width/2 - 50, (backCanvas.height - backCanvas.height/3), 15, 50));
+    backArray.push(new Particle(backCanvas.width/2, (backCanvas.height - backCanvas.height/3), 15, 50));
+    backArray.push(new Particle(backCanvas.width/2 + 50, (backCanvas.height - backCanvas.height/3), 15, 50));
+    
+    for (let i = 0; i < backArray.length; i++) {
+        backArray[i].draw(backCtx);
+        backArray[i].move();
+        if (backArray[i].size < 0) {
+            backArray.splice(i, 1);
+            i--;
+        }
+    }
 }
 
+
+//* ************ *//
+// BURNING EFFECT //
+//* ************ *//
 
 //Circle class used to create burning effect
 class Circle {
@@ -142,8 +237,6 @@ class Circle {
 //handles circle by updating and drawing all circles in the circlesArray. 
 //Slices circles that are a random size between 15 and 20 so they do not conintue updating/ growing.
 function handleCircles() {
-    //TESTING PURPOSE
-    //paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
 
     for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].update();
@@ -154,6 +247,12 @@ function handleCircles() {
     }
 }
 
+
+//* *************** *//
+// GENERAL FUNCTIONS //
+//* *************** *//
+
+//clears circlesArray and particlesArray and resets paper on screen. Will reset size of paperCanvas drawing surface relative to current window size.
 function reset() {
     circlesArray.splice(0, (circlesArray.length - 1));
     particleArray.splice(0, (particleArray.length - 1));
@@ -166,6 +265,9 @@ function reset() {
     paperCtx.fillStyle = "white";
     paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
     paperCanvas.globalCompositeOperation = 'source-over';
+
+    isPainting = false;
+    document.getElementById("drawButton").innerHTML = "draw";
 }
 
 //animates all effects by calling handleParticles and handleCircles.
@@ -175,10 +277,19 @@ function animate() {
     window.requestAnimationFrame(animate);
 }
 
-
 //Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
 paperCanvas.width = window.innerWidth * 0.4;
 paperCanvas.height = window.innerHeight * 0.9;
+
 paperCtx.fillStyle = "white";
 paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
-animate();
+// animate();
+
+/* create textarea element when screen is first loaded. All txt will be entered there until user 
+chooses to start burning paper. Then draw that text onto canvas same size as it was in the text box.
+that way it can be burned.
+possible issues. Areas were text was drawn might get erased when circles start erasing. 
+possible solution. Put text onto ANOTHER canvas and erase that canvas at the same time as the paper canvas??
+
+size would be hard to match up and may change if user tries to resize browser window
+Maybe just make paper fixed or have a min size? */
