@@ -8,15 +8,17 @@
         <title>Fireplace</title>    
     </head>
 
-    <body>
+    <body onload="start()">
         <canvas id="paper"></canvas>
         <canvas id="burn"></canvas>
         <canvas id="back"></canvas>
+        <img id="paperImg" src="images/paper.png">
         <!-- <textarea id="text"></textarea> -->
         <div class="buttons">
             <button id="startButton">start</button>
             <button id="resetButton">reset</button>
             <button id="drawButton">draw</button>
+            <input type="range" min="1" max="5" value="1" id="colorSlider">
         </div>
 
         <script src="javascript.js"></script>

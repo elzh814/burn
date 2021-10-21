@@ -23,6 +23,9 @@ const backArray = [];
 //determines if user wants to draw on paper. If false, user cannot draw on paper. If true, user can draw on paper.
 var isPainting = false;
 
+//determines if the program has been started
+var isStarted = false;
+
 const mouse = {
     x: undefined,
     y: undefined,
@@ -58,6 +61,7 @@ document.getElementById("startButton").addEventListener('click', function(event)
 
     //ISSUE: PRESSING START "SPEEDS UP" ALL ANIMATIONS. MAKE ISSTARTED VARIABLE AND TEST IF FALSE BEFORE CALLING ANIMATE FUNCTION 
     //CAN ALSO JUST MAKE START BUTTON TURN INTO END BUTTON INSTEAD OF STAYING START BUTTON
+    isStarted = true;
     animate();
 });
 
@@ -94,7 +98,7 @@ fireCanvas.addEventListener('mousemove', function(event){
     getCanvasMouse(event.x, event.y);
 
     for (let i = 0; i < 15; i ++) {
-        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17));
+        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17, 0.2));
     }
         circlesArray.push(new Circle());
 });
@@ -104,7 +108,7 @@ fireCanvas.addEventListener('click', function(event){
     mouse.x = event.x;
     mouse.y = event.y;
     for (let i = 0; i < 15; i ++) {
-        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17));
+        particleArray.push(new Particle(mouse.x, mouse.y, 2, 17, 0.2));
     }
 });
 
@@ -147,13 +151,14 @@ function isDown(event) {
 
 //Particle class. Circles that are used to create flame effect
 class Particle {
-    constructor(x, y, minSize, maxSize) {
+    constructor(x, y, minSize, maxSize, hueChange) {
         this.x = x;
         this.y = y;
         this.size = Math.random() * (maxSize - minSize) + minSize;
         this.speedX = Math.random() * 3 - 1.5;
         this.speedY = Math.random() * -3 - 1.5;
         this.hue = 65;
+        this.hueChange = hueChange;
         this.color = 'hsl(' + this.hue + ', 100%, 50%)';
     }
     
@@ -161,7 +166,7 @@ class Particle {
     move() {
         this.x += this.speedX / 2;
         this.y += this.speedY;
-        this.hue -= this.size * 0.2;
+        this.hue -= this.size * this.hueChange;
         this.color = 'hsl(' + this.hue + ', 100%, 50%)';
         this.size -= 0.4;
     }
@@ -188,12 +193,12 @@ function handleParticles() {
         }
     }
 
-    //TESTING PURPOSES
+    //Creates fire in background
     backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
-   
-    backArray.push(new Particle(backCanvas.width/2 - 50, (backCanvas.height - backCanvas.height/3), 15, 50));
-    backArray.push(new Particle(backCanvas.width/2, (backCanvas.height - backCanvas.height/3), 15, 50));
-    backArray.push(new Particle(backCanvas.width/2 + 50, (backCanvas.height - backCanvas.height/3), 15, 50));
+    let colorChange = document.getElementById("colorSlider").value * 0.02;
+    backArray.push(new Particle(window.innerWidth/2 - 70, (window.innerHeight - window.innerHeight/3), 20, 60, colorChange));
+    backArray.push(new Particle(window.innerWidth/2, (window.innerHeight - window.innerHeight/2.7), 20, 70, colorChange));
+    backArray.push(new Particle(window.innerWidth/2 + 70, (window.innerHeight - window.innerHeight/3), 20, 60, colorChange));
     
     for (let i = 0; i < backArray.length; i++) {
         backArray[i].draw(backCtx);
@@ -241,7 +246,7 @@ function handleCircles() {
     for (let i = 0; i < circlesArray.length; i++) {
         circlesArray[i].update();
         circlesArray[i].draw();
-        if (circlesArray[i].size > Math.floor(Math.random() * 500 + 20)) { //150 - 50
+        if (circlesArray[i].size > Math.floor(Math.random() * 550 + 30)) { //150 - 50
             circlesArray.splice(i, 1);
         }
     }
@@ -252,39 +257,49 @@ function handleCircles() {
 // GENERAL FUNCTIONS //
 //* *************** *//
 
-//clears circlesArray and particlesArray and resets paper on screen. Will reset size of paperCanvas drawing surface relative to current window size.
+//clears arrays and canvases. Will reset size of paperCanvas drawing surface relative to current window size.
 function reset() {
+    isStarted = false
+    isPainting = false;
+
     circlesArray.splice(0, (circlesArray.length - 1));
     particleArray.splice(0, (particleArray.length - 1));
+    backArray.splice(0, (backArray.length - 1));
     fireCanvas.width = 0;
     fireCanvas.height = 0;
 
+    fireCanvas.clearRect(0, 0, 0, 0);
+    backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
     paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
-    paperCanvas.width = window.innerWidth * 0.4;
-    paperCanvas.height = window.innerHeight * 0.9;
-    paperCtx.fillStyle = "white";
-    paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
     paperCanvas.globalCompositeOperation = 'source-over';
 
-    isPainting = false;
+    
     document.getElementById("drawButton").innerHTML = "draw";
+    start();
 }
 
 //animates all effects by calling handleParticles and handleCircles.
 function animate() {
-    handleParticles()
-    handleCircles()
-    window.requestAnimationFrame(animate);
+    if(isStarted) {
+        handleParticles()
+        handleCircles()
+        window.requestAnimationFrame(animate);
+    }
 }
 
-//Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
-paperCanvas.width = window.innerWidth * 0.4;
-paperCanvas.height = window.innerHeight * 0.9;
+//* ***************** *//
+// WHERE IT ALL STARTS //
+// * **************** *//
 
-paperCtx.fillStyle = "white";
-paperCtx.fillRect(0, 0, paperCanvas.width, paperCanvas.height);
-// animate();
+function start() {
+    //Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
+    paperCanvas.width = window.innerWidth * 0.4;
+    paperCanvas.height = window.innerHeight * 0.9;
 
+    //Draws the paper image onto the paperCanvas
+    const paperImage = document.getElementById("paperImg");
+    paperCtx.drawImage(paperImage, 0, 0, paperCanvas.width, paperCanvas.height);
+}
 /* create textarea element when screen is first loaded. All txt will be entered there until user 
 chooses to start burning paper. Then draw that text onto canvas same size as it was in the text box.
 that way it can be burned.

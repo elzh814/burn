@@ -51,6 +51,10 @@ body, html {
     z-index: 10;
 }
 
+#paperImg {
+    display: none;
+}
+
 /* .text {
     position: fixed;
 
