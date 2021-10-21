@@ -268,12 +268,10 @@ function reset() {
     fireCanvas.width = 0;
     fireCanvas.height = 0;
 
-    fireCanvas.clearRect(0, 0, 0, 0);
     backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
     paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
     paperCanvas.globalCompositeOperation = 'source-over';
 
-    
     document.getElementById("drawButton").innerHTML = "draw";
     start();
 }
