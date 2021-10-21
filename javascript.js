@@ -62,6 +62,8 @@ document.getElementById("startButton").addEventListener('click', function(event)
     //ISSUE: PRESSING START "SPEEDS UP" ALL ANIMATIONS. MAKE ISSTARTED VARIABLE AND TEST IF FALSE BEFORE CALLING ANIMATE FUNCTION 
     //CAN ALSO JUST MAKE START BUTTON TURN INTO END BUTTON INSTEAD OF STAYING START BUTTON
     isStarted = true;
+    document.getElementById("startButton").disabled = true;
+    document.getElementById("drawButton").disabled = true;
     animate();
 });
 
@@ -127,6 +129,7 @@ function paint(event) {
         getCanvasMouse(event.x, event.y)
         paperCtx.lineWidth = 10;
         paperCtx.lineCap = 'round';
+        paperCtx.linejoin = 'round';
         paperCtx.lineTo(canvasMouse.x, canvasMouse.y);
         paperCtx.stroke();
     }
@@ -196,9 +199,9 @@ function handleParticles() {
     //Creates fire in background
     backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
     let colorChange = document.getElementById("colorSlider").value * 0.02;
-    backArray.push(new Particle(window.innerWidth/2 - 70, (window.innerHeight - window.innerHeight/3), 20, 60, colorChange));
-    backArray.push(new Particle(window.innerWidth/2, (window.innerHeight - window.innerHeight/2.7), 20, 70, colorChange));
-    backArray.push(new Particle(window.innerWidth/2 + 70, (window.innerHeight - window.innerHeight/3), 20, 60, colorChange));
+    backArray.push(new Particle(window.innerWidth/2 - 70, (window.innerHeight - window.innerHeight/3), 40, 60, colorChange));
+    backArray.push(new Particle(window.innerWidth/2, (window.innerHeight - window.innerHeight/2.8), 40, 70, colorChange));
+    backArray.push(new Particle(window.innerWidth/2 + 70, (window.innerHeight - window.innerHeight/3), 40, 60, colorChange));
     
     for (let i = 0; i < backArray.length; i++) {
         backArray[i].draw(backCtx);
@@ -297,6 +300,8 @@ function start() {
     //Draws the paper image onto the paperCanvas
     const paperImage = document.getElementById("paperImg");
     paperCtx.drawImage(paperImage, 0, 0, paperCanvas.width, paperCanvas.height);
+    document.getElementById("startButton").disabled = false;
+    document.getElementById("drawButton").disabled = false;
 }
 /* create textarea element when screen is first loaded. All txt will be entered there until user 
 chooses to start burning paper. Then draw that text onto canvas same size as it was in the text box.

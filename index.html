@@ -9,18 +9,21 @@
     </head>
 
     <body onload="start()">
+        <!-- <textarea id="text" name="text" autofocus="true" rows="10" cols="50"></textarea> -->
         <canvas id="paper"></canvas>
         <canvas id="burn"></canvas>
         <canvas id="back"></canvas>
         <img id="paperImg" src="images/paper.png">
-        <!-- <textarea id="text"></textarea> -->
-        <div class="buttons">
-            <button id="startButton">start</button>
-            <button id="resetButton">reset</button>
-            <button id="drawButton">draw</button>
-            <input type="range" min="1" max="5" value="1" id="colorSlider">
-        </div>
+        <img id="logImg" src="images/log.png">
 
+        <div class="buttons">
+            <button id="startButton">Start!</button><br>
+            <button id="resetButton">Reset</button><br>
+            <button id="drawButton">Draw</button><br>
+            <label>Fire Color</label><br>
+            <input type="range" min="1" max="5" value="1" id="colorSlider"><br>
+        </div>
+        <button id="about">About</button><br>
         <script src="javascript.js"></script>
     </body>
 </html>

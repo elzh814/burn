@@ -5,7 +5,6 @@
 
 body, html {
     background-image: url(images/fireplace.jpg);
-    /* background-color: black; */
     background-repeat: no-repeat;
     background-size: 100%  100%;
     width: 100%;
@@ -13,6 +12,7 @@ body, html {
     margin: 0;
     overflow: hidden;
     font-family: 'Handwritten';
+    color: white;
 }
 
 #paper {
@@ -29,15 +29,13 @@ body, html {
     left: 0%;
     right: 0%;
     margin: 0;
-    z-index: 9;
+    z-index: 10;
 }
 #back {
     position: relative;
     left: 0%;
     right: 0%;
     margin: 0;
-    /* width: 100%;
-    height: 100%; */
     z-index: 0;
 }
 
@@ -47,15 +45,61 @@ body, html {
     width: 10%;
     height: 40%;
     margin: 2%;
-    background-color: aquamarine;
-    z-index: 10;
+    z-index: 11;
+    margin-bottom: 5%;
+}
+
+.buttons button {
+    background-color: rgb(160, 37, 15);
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    display: block;
+    font-size: 2em;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Handwritten';
+}
+
+button:disabled {
+    opacity: 0.6;
 }
 
 #paperImg {
     display: none;
 }
 
+#logImg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+}
+
+#about {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    z-index: 12;
+
+    background-color: rgb(132, 33, 8);
+    border: none;
+    color: white;
+    padding: 3px 7px;
+    text-align: center;
+    font-size: 1.5em;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Handwritten';
+}
+
 /* .text {
     position: fixed;
-
+    left: 27%;
+    width: 40%;
+    height: 90%;
+    z-index: 5;
 } */
