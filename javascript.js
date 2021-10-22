@@ -85,6 +85,30 @@ document.getElementById("drawButton").addEventListener('click', function(event) 
     }
 });
 
+document.getElementById("aboutButton").addEventListener('click', function(event) {
+    let aboutCon = document.getElementById("about_container");
+    aboutCon.style.zIndex = 14;
+    aboutCon.style.backgroundColor = "black";
+    let aboutPara = document.createElement("p");
+    aboutPara.innerHTML="Have you ever been angry? Of course you have! We all have! Anger is a very healthy and understandable emotion to feel so long as you find a positive outlet for your emotions. Here, you can scribble out all your anger and burn it without the dangers of actual arson. <br> <br> When you're ready, press the Draw button to begin drawing. Once you're finished putting your thoughts to paper, burn it by pressing the Start button. Feel free to relax and enjoy the fireplace once you're done! Still have some hot thoughts to burn? Press the Reset button for a fresh sheet of paper! Happy burning!";
+    aboutCon.appendChild(aboutPara);
+    document.getElementById("aboutButton").disabled = true;
+    let closeButton = document.createElement("button");
+    closeButton.id = "closeButton";
+    closeButton.innerHTML = "Close";
+    aboutCon.appendChild(closeButton);
+
+    closeButton.addEventListener('click', function(event){
+        aboutCon.style.backgroundColor = 'transparent';
+        aboutPara.remove();
+        closeButton.remove();
+        aboutCon.style.zIndex = -1;
+        document.getElementById("aboutButton").disabled = false;
+    });
+
+});
+
+
 //resizes fireCanvas to fit window when window is resized
 window.addEventListener('resize', function(event) {
     if (fireCanvas.width != 0) {
@@ -238,7 +262,6 @@ class Circle {
     //increases the size of the circle
     update() {
         this.size += this.burnSpeed;
-        // FIND WAY TO MAKE SPEED INVERSE TO SIZE
     }
 }
 
@@ -275,7 +298,7 @@ function reset() {
     paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
     paperCanvas.globalCompositeOperation = 'source-over';
 
-    document.getElementById("drawButton").innerHTML = "draw";
+    document.getElementById("drawButton").innerHTML = "Draw";
     start();
 }
 
