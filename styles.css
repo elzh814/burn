@@ -14,6 +14,8 @@ body, html {
     font-family: 'Handwritten';
     color: white;
     font-size: 1vw;
+
+    background-color: rgb(31, 4, 4);
 }
 
 #paper {
@@ -136,7 +138,6 @@ button:disabled {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    border: solid blue;
     min-height: 250px;
     
     background-image: url(images/fireplace.jpg);
