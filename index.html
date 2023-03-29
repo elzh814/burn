@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="styles.css">
-        <title>Hot Thoughts</title>    
-    </head>
 
-    <body onload="start()">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Hot Thoughts</title>
+</head>
+
+<body onload="start()">
+    <div class="frame" id="main-frame">
+
         <!-- <textarea id="text" name="text" autofocus="true" rows="10" cols="50"></textarea> -->
         <canvas id="paper"></canvas>
         <canvas id="burn"></canvas>
@@ -27,6 +30,10 @@
             <!-- <button id="closeButton">Draw</button><br> -->
         </div>
         <button id="aboutButton">About</button><br>
-        <script src="javascript.js"></script>
-    </body>
+
+    </div>
+
+    <script src="javascript.js"></script>
+</body>
+
 </html>

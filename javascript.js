@@ -14,10 +14,12 @@ var paperCanvas = document.getElementById("paper");
 var paperCtx = paperCanvas.getContext("2d");
 const circlesArray = [];
 
+const frame = document.getElementById("main-frame");
+
 var backCanvas = document.getElementById("back");
 var backCtx = backCanvas.getContext("2d");
-backCanvas.width = window.innerWidth;
-backCanvas.height = window.innerHeight;
+backCanvas.width = frame.scrollWidth;
+backCanvas.height = frame.clientHeight;
 const backArray = [];
 
 //determines if user wants to draw on paper. If false, user cannot draw on paper. If true, user can draw on paper.
@@ -56,8 +58,8 @@ function getCanvasMouse(x, y) {
 
 //makes fireCanvas size equal window so fire effect can appear
 document.getElementById("startButton").addEventListener('click', function(event){
-    fireCanvas.width = window.innerWidth;
-    fireCanvas.height = window.innerHeight;
+    fireCanvas.width = frame.scrollWidth;
+    fireCanvas.height = frame.clientHeight;
 
     //ISSUE: PRESSING START "SPEEDS UP" ALL ANIMATIONS. MAKE ISSTARTED VARIABLE AND TEST IF FALSE BEFORE CALLING ANIMATE FUNCTION 
     //CAN ALSO JUST MAKE START BUTTON TURN INTO END BUTTON INSTEAD OF STAYING START BUTTON
@@ -112,15 +114,20 @@ document.getElementById("aboutButton").addEventListener('click', function(event)
 //resizes fireCanvas to fit window when window is resized
 window.addEventListener('resize', function(event) {
     if (fireCanvas.width != 0) {
-        fireCanvas.width = window.innerWidth;
-        fireCanvas.height = window.innerHeight;
+        fireCanvas.width = frame.scrollWidth;
+        fireCanvas.height = frame.clientHeight;
     }
+    backCanvas.width = frame.clientWidth;
+    backCanvas.height = frame.clientHeight;
+
+    // things get messy here so I'm resetting until I figure this out...one day...
+    reset();
 });
 
 //adds particles when mouse is moved
 fireCanvas.addEventListener('mousemove', function(event){
-    mouse.x = event.x;
-    mouse.y = event.y;
+    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth)/2);
+    mouse.y = event.y - ((window.innerHeight - frame.clientHeight)/2);
     getCanvasMouse(event.x, event.y);
 
     for (let i = 0; i < 15; i ++) {
@@ -131,8 +138,8 @@ fireCanvas.addEventListener('mousemove', function(event){
 
 //add particles when mouse is clicked
 fireCanvas.addEventListener('click', function(event){
-    mouse.x = event.x;
-    mouse.y = event.y;
+    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth)/2);
+    mouse.y = event.y - ((window.innerHeight - frame.clientHeight)/2);
     for (let i = 0; i < 15; i ++) {
         particleArray.push(new Particle(mouse.x, mouse.y, 2, 17, 0.2));
     }
@@ -223,9 +230,9 @@ function handleParticles() {
     //Creates fire in background
     backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
     let colorChange = document.getElementById("colorSlider").value * 0.02;
-    backArray.push(new Particle(window.innerWidth/2 - 70, (window.innerHeight - window.innerHeight/3), 40, 60, colorChange));
-    backArray.push(new Particle(window.innerWidth/2, (window.innerHeight - window.innerHeight/2.8), 40, 70, colorChange));
-    backArray.push(new Particle(window.innerWidth/2 + 70, (window.innerHeight - window.innerHeight/3), 40, 60, colorChange));
+    backArray.push(new Particle(frame.clientWidth/2 - (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight/3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
+    backArray.push(new Particle(frame.clientWidth/2, (frame.clientHeight - frame.clientHeight/2.9), frame.clientHeight * .07, frame.clientHeight * .1, colorChange));
+    backArray.push(new Particle(frame.clientWidth/2 + (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight/3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
     
     for (let i = 0; i < backArray.length; i++) {
         backArray[i].draw(backCtx);
@@ -317,8 +324,8 @@ function animate() {
 
 function start() {
     //Resizes paperCanvas size AND drawing surface size of paperCanvas. Style Sheet only resizes canvas size, not drawing surface size
-    paperCanvas.width = window.innerWidth * 0.4;
-    paperCanvas.height = window.innerHeight * 0.9;
+    paperCanvas.width = frame.clientWidth * 0.5;
+    paperCanvas.height = frame.clientHeight * 0.9;
 
     //Draws the paper image onto the paperCanvas
     const paperImage = document.getElementById("paperImg");
