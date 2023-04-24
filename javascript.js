@@ -44,39 +44,58 @@ const canvasMouse = {
 //calculates for mouse coordinates relative to canvas
 function getCanvasMouse(x, y) {
     let canvasRect = paperCanvas.getBoundingClientRect();
-    let scaleX = paperCanvas.width/canvasRect.width;
-    let scaleY = paperCanvas.height/canvasRect.height;
+    let scaleX = paperCanvas.width / canvasRect.width;
+    let scaleY = paperCanvas.height / canvasRect.height;
 
     canvasMouse.x = (x - canvasRect.left) * scaleX;
     canvasMouse.y = (y - canvasRect.top) * scaleY;
 }
 
+// the interval id;
+var id;
+
+var textarea = document.getElementById("text");
+var writeButton = document.getElementById("writeButton");
+
+var isTyping = false;
 
 //* ************* *//
 // EVENT LISTENERS //
 //* ************* *//
 
 //makes fireCanvas size equal window so fire effect can appear
-document.getElementById("startButton").addEventListener('click', function(event){
+document.getElementById("startButton").addEventListener('click', function (event) {
     fireCanvas.width = frame.scrollWidth;
     fireCanvas.height = frame.clientHeight;
 
-    //ISSUE: PRESSING START "SPEEDS UP" ALL ANIMATIONS. MAKE ISSTARTED VARIABLE AND TEST IF FALSE BEFORE CALLING ANIMATE FUNCTION 
-    //CAN ALSO JUST MAKE START BUTTON TURN INTO END BUTTON INSTEAD OF STAYING START BUTTON
     isStarted = true;
     document.getElementById("startButton").disabled = true;
     document.getElementById("drawButton").disabled = true;
-    animate();
+    writeButton.disabled = true;
+
+    let text = textarea.value.split('\n');
+    let lineHeight = 36;
+    console.log(text);
+
+    paperCtx.font = "normal 600 40px Handwritten";
+    for (let i = 0; i < text.length; i++) {
+        paperCtx.fillText(text[i], textarea.getBoundingClientRect().x - paperCanvas.getBoundingClientRect().x + 2, (textarea.getBoundingClientRect().y - (paperCanvas.getBoundingClientRect().y - 32) + i * lineHeight));
+    }
+    // paperCtx.fillText(textarea.value, textarea.getBoundingClientRect().x - paperCanvas.getBoundingClientRect().x + 3, textarea.getBoundingClientRect().y - (paperCanvas.getBoundingClientRect().y - 30));
+    textarea.value = "";
+    textarea.style.pointerEvents = "none";
+
+    id = setInterval(animate, 15);
 });
 
 //calls reset function to clear circle and particle arrays and reset paper
-document.getElementById("resetButton").addEventListener('click', function(event) {
+document.getElementById("resetButton").addEventListener('click', function (event) {
     reset();
 });
 
 //sets draw to true if draw is false. Sets draw to false if draw is true.
-document.getElementById("drawButton").addEventListener('click', function(event) {
-    if(!isPainting) {
+document.getElementById("drawButton").addEventListener('click', function (event) {
+    if (!isPainting) {
         document.getElementById("drawButton").innerHTML = "stop drawing";
         isPainting = true;
         mouse.down = false;
@@ -85,14 +104,35 @@ document.getElementById("drawButton").addEventListener('click', function(event) 
         mouse.down = false;
         document.getElementById("drawButton").innerHTML = "draw";
     }
+
+    writeButton.innerHTML = "Write";
+    textarea.style.pointerEvents = "none";
+    isTyping = false;
 });
 
-document.getElementById("aboutButton").addEventListener('click', function(event) {
+document.getElementById("writeButton").addEventListener('click', function () {
+    if (isTyping) {
+        writeButton.innerHTML = "Write";
+        textarea.style.pointerEvents = "none";
+        isTyping = false;
+    } else {
+        writeButton.innerHTML = "Stop Writing";
+        textarea.style.pointerEvents = "all";
+        textarea.focus();
+        isTyping = true;
+    }
+    document.getElementById("drawButton").innerHTML = "draw";
+    isPainting = false;
+
+
+});
+
+document.getElementById("aboutButton").addEventListener('click', function (event) {
     let aboutCon = document.getElementById("about_container");
     aboutCon.style.zIndex = 14;
     aboutCon.style.backgroundColor = "black";
     let aboutPara = document.createElement("p");
-    aboutPara.innerHTML="Have you ever been angry? Of course you have! We all have! Anger is a very healthy and understandable emotion to feel so long as you find a positive outlet for your emotions. Here, you can scribble out all your anger and burn it without the dangers of actual arson. <br> <br> When you're ready, press the Draw button to begin drawing. Once you're finished putting your thoughts to paper, burn it by pressing the Start button. Feel free to relax and enjoy the fireplace once you're done! Still have some hot thoughts to burn? Press the Reset button for a fresh sheet of paper! Happy burning!";
+    aboutPara.innerHTML = "Have you ever been angry? Of course you have! We all have! Anger is a very healthy and understandable emotion to feel so long as you find a positive outlet for your emotions. Here, you can scribble out all your anger and burn it without the dangers of actual arson. <br> <br> When you're ready, press the Draw button to begin drawing, or the Write button to start typing. Once you're finished putting your thoughts to paper, burn it by pressing the Start button. Feel free to relax and enjoy the fireplace once you're done! Still have some hot thoughts to burn? Press the Reset button for a fresh sheet of paper! Happy burning!";
     aboutCon.appendChild(aboutPara);
     document.getElementById("aboutButton").disabled = true;
     let closeButton = document.createElement("button");
@@ -100,7 +140,7 @@ document.getElementById("aboutButton").addEventListener('click', function(event)
     closeButton.innerHTML = "Close";
     aboutCon.appendChild(closeButton);
 
-    closeButton.addEventListener('click', function(event){
+    closeButton.addEventListener('click', function (event) {
         aboutCon.style.backgroundColor = 'transparent';
         aboutPara.remove();
         closeButton.remove();
@@ -112,7 +152,7 @@ document.getElementById("aboutButton").addEventListener('click', function(event)
 
 
 //resizes fireCanvas to fit window when window is resized
-window.addEventListener('resize', function(event) {
+window.addEventListener('resize', function (event) {
     if (fireCanvas.width != 0) {
         fireCanvas.width = frame.scrollWidth;
         fireCanvas.height = frame.clientHeight;
@@ -124,23 +164,34 @@ window.addEventListener('resize', function(event) {
     reset();
 });
 
-//adds particles when mouse is moved
-fireCanvas.addEventListener('mousemove', function(event){
-    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth)/2);
-    mouse.y = event.y - ((window.innerHeight - frame.clientHeight)/2);
+// adds particles to location of event.
+function addParticles(event) {
+    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth) / 2);
+    mouse.y = event.y - ((window.innerHeight - frame.clientHeight) / 2);
     getCanvasMouse(event.x, event.y);
 
-    for (let i = 0; i < 15; i ++) {
+    for (let i = 0; i < 15; i++) {
         particleArray.push(new Particle(mouse.x, mouse.y, 2, 17, 0.2));
     }
-        circlesArray.push(new Circle());
+    circlesArray.push(new Circle());
+}
+
+//adds particles when mouse is moved
+// TODO: One day add touchscreen support...
+fireCanvas.addEventListener('mousemove', function (event) {
+    addParticles(event);
 });
 
+fireCanvas.addEventListener('touchmove', function (event) {
+    addParticles(event);
+});
+
+
 //add particles when mouse is clicked
-fireCanvas.addEventListener('click', function(event){
-    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth)/2);
-    mouse.y = event.y - ((window.innerHeight - frame.clientHeight)/2);
-    for (let i = 0; i < 15; i ++) {
+fireCanvas.addEventListener('click', function (event) {
+    mouse.x = event.x - ((window.innerWidth - frame.scrollWidth) / 2);
+    mouse.y = event.y - ((window.innerHeight - frame.clientHeight) / 2);
+    for (let i = 0; i < 15; i++) {
         particleArray.push(new Particle(mouse.x, mouse.y, 2, 17, 0.2));
     }
 });
@@ -168,7 +219,7 @@ function paint(event) {
 
 //Checks if the mouse is down
 function isDown(event) {
-    if(event.type == 'mousedown') {
+    if (event.type == 'mousedown') {
         getCanvasMouse(event.x, event.y);
         paperCtx.beginPath();
         paperCtx.moveTo(canvasMouse.x, canvasMouse.y);
@@ -195,7 +246,7 @@ class Particle {
         this.hueChange = hueChange;
         this.color = 'hsl(' + this.hue + ', 100%, 50%)';
     }
-    
+
     //handles the movement of the particles
     move() {
         this.x += this.speedX / 2;
@@ -214,7 +265,7 @@ class Particle {
     }
 }
 
-//Handles the drawing and movement of the particles using requestAnimationFrame function
+//Handles the drawing and movement of the particles using setInterval function
 function handleParticles() {
     fireCtx.clearRect(0, 0, fireCanvas.width, fireCanvas.height);
 
@@ -229,11 +280,11 @@ function handleParticles() {
 
     //Creates fire in background
     backCtx.clearRect(0, 0, backCanvas.width, backCanvas.height);
-    let colorChange = document.getElementById("colorSlider").value * 0.02;
-    backArray.push(new Particle(frame.clientWidth/2 - (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight/3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
-    backArray.push(new Particle(frame.clientWidth/2, (frame.clientHeight - frame.clientHeight/2.9), frame.clientHeight * .07, frame.clientHeight * .1, colorChange));
-    backArray.push(new Particle(frame.clientWidth/2 + (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight/3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
-    
+    let colorChange = document.getElementById("colorSlider").value * 0.01;
+    backArray.push(new Particle(frame.clientWidth / 2 - (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight / 3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
+    backArray.push(new Particle(frame.clientWidth / 2, (frame.clientHeight - frame.clientHeight / 2.9), frame.clientHeight * .07, frame.clientHeight * .1, colorChange));
+    backArray.push(new Particle(frame.clientWidth / 2 + (frame.clientWidth * .06), (frame.clientHeight - frame.clientHeight / 3), frame.clientHeight * .04, frame.clientHeight * .07, colorChange));
+
     for (let i = 0; i < backArray.length; i++) {
         backArray[i].draw(backCtx);
         backArray[i].move();
@@ -252,10 +303,10 @@ function handleParticles() {
 //Circle class used to create burning effect
 class Circle {
     constructor() {
-    this.size = 0.7;
-    this.burnSpeed = Math.random() * 0.25 + 0.10;
-    this.x = canvasMouse.x + (Math.random() * 25 - 25);
-    this.y = canvasMouse.y + (Math.random() * 25 - 25);
+        this.size = 0.7;
+        this.burnSpeed = Math.random() * 0.25 + 0.10;
+        this.x = canvasMouse.x + (Math.random() * 25 - 25);
+        this.y = canvasMouse.y + (Math.random() * 25 - 25);
     }
 
     //"erases" the circle from the paper canvas
@@ -294,7 +345,9 @@ function handleCircles() {
 function reset() {
     isStarted = false
     isPainting = false;
+    isTyping = false;
 
+    clearInterval(id);
     circlesArray.splice(0, (circlesArray.length - 1));
     particleArray.splice(0, (particleArray.length - 1));
     backArray.splice(0, (backArray.length - 1));
@@ -305,16 +358,19 @@ function reset() {
     paperCtx.clearRect(0, 0, paperCanvas.width, paperCanvas.height);
     paperCanvas.globalCompositeOperation = 'source-over';
 
+    textarea.value = "";
+
     document.getElementById("drawButton").innerHTML = "Draw";
+    writeButton.innerHTML = "Write";
     start();
 }
 
 //animates all effects by calling handleParticles and handleCircles.
 function animate() {
-    if(isStarted) {
+    if (isStarted) {
         handleParticles()
         handleCircles()
-        window.requestAnimationFrame(animate);
+        // window.requestAnimationFrame(animate);
     }
 }
 
@@ -332,6 +388,7 @@ function start() {
     paperCtx.drawImage(paperImage, 0, 0, paperCanvas.width, paperCanvas.height);
     document.getElementById("startButton").disabled = false;
     document.getElementById("drawButton").disabled = false;
+    writeButton.disabled = false;
 }
 /* create textarea element when screen is first loaded. All txt will be entered there until user 
 chooses to start burning paper. Then draw that text onto canvas same size as it was in the text box.

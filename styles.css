@@ -3,7 +3,8 @@
     src: url('images/Written_1-Regular.otf');
 }
 
-body, html {
+body,
+html {
     /* background-image: url(images/fireplace.jpg);
     background-repeat: no-repeat;
     background-size: 100%  100%; */
@@ -57,7 +58,7 @@ button {
     background-color: rgb(125, 31, 14);
     border: none;
     color: white;
-    padding: 10px 15px;
+    padding: 10px;
     text-align: center;
     display: block;
     font-size: 1em;
@@ -81,6 +82,8 @@ button:disabled {
     width: 100%;
     height: 100%;
     z-index: 3;
+
+    pointer-events: none;
 }
 
 #aboutButton {
@@ -88,14 +91,14 @@ button:disabled {
     bottom: 5%;
     right: 5%;
     z-index: 12;
-    
+
     font-size: 1.5em;
     border-radius: 4px;
 }
 
 #about_container {
     position: absolute;
-    top:0;
+    top: 0;
     left: 27%;
     width: 40%;
     height: 90%;
@@ -139,8 +142,35 @@ button:disabled {
     top: 50%;
     transform: translate(-50%, -50%);
     min-height: 250px;
-    
+
     background-image: url(images/fireplace.jpg);
     background-repeat: no-repeat;
-    background-size: 100%  100%;
+    background-size: 100% 100%;
+}
+
+#text {
+    position: absolute;
+    left: 27%;
+    width: 44%;
+    height: 78%;
+    margin: 6%;
+    z-index: 4;
+    background-color: rgba(0, 0, 0, 0);
+    border: 0;
+    z-index: 9;
+
+    font-family: 'Handwritten';
+    font-size: 40px;
+    font-weight: 600;
+
+    pointer-events: none;
+    resize: none;
+
+    /* white-space: pre-wrap; */
+    white-space: nowrap;
+
+}
+
+#colorSlider {
+    width: calc(60px + 50%);
 }

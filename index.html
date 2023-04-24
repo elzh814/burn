@@ -6,13 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="images/png" href="images/fireCon.png">
     <title>Hot Thoughts</title>
 </head>
 
 <body onload="start()">
     <div class="frame" id="main-frame">
 
-        <!-- <textarea id="text" name="text" autofocus="true" rows="10" cols="50"></textarea> -->
+        <textarea id="text"></textarea>
         <canvas id="paper"></canvas>
         <canvas id="burn"></canvas>
         <canvas id="back"></canvas>
@@ -23,6 +24,7 @@
             <button id="startButton">Start!</button><br>
             <button id="resetButton">Reset</button><br>
             <button id="drawButton">Draw</button><br>
+            <button id="writeButton">Write</button><br>
             <label>Fire Color</label><br>
             <input type="range" min="1" max="5" value="1" id="colorSlider"><br>
         </div>
